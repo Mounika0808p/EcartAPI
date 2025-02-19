@@ -14,11 +14,11 @@ namespace EcartAPI.Models
 
 
         [ForeignKey("CustomerId")]
-        public Customers customers { get; set; }
+        public Customers? customers { get; set; }
 
         [ForeignKey("ProductId")]
 
-        public Product Product { get; set; }
+        public Product? Product { get; set; }
         
            
         

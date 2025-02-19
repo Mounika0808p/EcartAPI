@@ -71,20 +71,27 @@ namespace EcartAPI.Controllers
         [HttpPost("Createcustomer")]
         public async Task<ActionResult<Customers>> PostCustomer([FromBody] Customers customers)
         {
-            if (customers == null)
+            try
             {
-                return BadRequest("Invalid customer data.");
-            }
-            foreach (var order in customers.Orders)
-            {
-                var product = await _context.Products.FindAsync(order.Product.ProductId);
-                if (product == null)
+                if (customers == null)
                 {
-                    return BadRequest($"Product with ID {order.Product.ProductId} does not exist.");
+                    return BadRequest("Invalid customer data.");
                 }
+                foreach (var order in customers.Orders)
+                {
+                    var existingProduct = await _context.Products.FindAsync(order.Product.ProductId);
+                    if (existingProduct == null)
+                    {
+                        return BadRequest($"Product with ID {order.Product.ProductId} does not exist.");
+                    }
+                    order.Product = existingProduct;
+                }
+                _context.Customers.Add(customers);
+                await _context.SaveChangesAsync();
+            }catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
-            _context.Customers.Add(customers);
-            await _context.SaveChangesAsync();
             return Ok(customers);
         }
 
